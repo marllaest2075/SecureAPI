@@ -21,8 +21,8 @@ namespace Intento001.Shared
                 new Claim("userName","Admin")
             };
             var token = new JwtSecurityToken(
-                "Http://localhost:52875",
-                "Http://localhost:52875",
+                "xyz5",
+                "xyz5",
                 claims,
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddMinutes(30),
