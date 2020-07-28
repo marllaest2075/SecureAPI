@@ -27,14 +27,8 @@ namespace Intento001
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureJwtAuthentication();
-            services.AddAuthorization(options =>
-            {
-                options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-                .RequireAuthenticatedUser().Build();
+            services.ConfigureJwtAuthentication();// este eta en el archivo AuthenticationConfig.cs
 
-            });
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddControllers();
         }
 
@@ -48,7 +42,7 @@ namespace Intento001
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseAuthorization();// se usa autorisacion para u los tokens
 
             app.UseEndpoints(endpoints =>
             {

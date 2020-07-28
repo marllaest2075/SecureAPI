@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -40,11 +42,7 @@ namespace Intento001.Shared
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
-            {
-                new Claim("userName",""),
-                new Claim("password","")
-            };
+           
             validationParameters = new TokenValidationParameters()
             {
                 ValidateIssuerSigningKey = true,
@@ -69,6 +67,13 @@ namespace Intento001.Shared
                 options.RequireHttpsMetadata = false;
 #endif
             });
+            services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser().Build();
+
+            });
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
         }
     }
