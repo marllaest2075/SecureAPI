@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Intento001.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -16,9 +17,12 @@ namespace Intento001.Controllers
     {
         
         [HttpGet]
-        public string Get()
+        public string Get(string user, string pass)
         {
-            return AuthenticationConfig.CreateJsonWebToken();
+            if (user == "Admin" && pass =="123")
+                return AuthenticationConfig.CreateJsonWebToken(user,pass);
+            else
+                return "";
         }
 
         
@@ -26,7 +30,10 @@ namespace Intento001.Controllers
         [HttpPost]
         public string Post()
         {
-            return "true";
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IEnumerable<Claim> claims = identity.Claims;
+            var username = claims.Where(x => x.Type == "userName").Select(c => c.Value).SingleOrDefault();
+            return $"Bien venido {username}";
         }
 
        

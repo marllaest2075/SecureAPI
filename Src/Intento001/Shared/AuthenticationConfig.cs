@@ -14,20 +14,21 @@ namespace Intento001.Shared
     public static class AuthenticationConfig
     {
         public const string key = "CB1E08171A72D65C8AC9CD758531FD55B104F81918D0A20C2EFFC3EE533003DC";
-        public static string CreateJsonWebToken()
+        public static string CreateJsonWebToken(string user, string pass)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim("userName","Admin")
+                new Claim("userName",user),
+                new Claim("password",pass)
             };
             var token = new JwtSecurityToken(
                 "xyz5",
                 "xyz5",
                 claims,
                 DateTime.UtcNow,
-                DateTime.UtcNow.AddMinutes(30),
+                DateTime.UtcNow.AddMinutes(5),
                 signingCredentials: credentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -41,7 +42,8 @@ namespace Intento001.Shared
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim("userName","Admin")
+                new Claim("userName",""),
+                new Claim("password","")
             };
             validationParameters = new TokenValidationParameters()
             {
@@ -52,7 +54,7 @@ namespace Intento001.Shared
                 ValidateAudience = true,
                 RequireSignedTokens = true,
                 IssuerSigningKey = credentials.Key,
-                ClockSkew = TimeSpan.FromMinutes(30)
+                ClockSkew = TimeSpan.FromMinutes(5)
             };
             services.AddAuthentication(options =>
             {
