@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,6 +31,43 @@ namespace Intento001.Shared
                 signingCredentials: credentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        internal static TokenValidationParameters validationParameters;
+
+        public static void ConfigureJwtAuthentication(this IServiceCollection services)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[]
+            {
+                new Claim("userName","Admin")
+            };
+            validationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = "xyz5",
+                ValidateLifetime = true,
+                ValidAudience = "xyz5",
+                ValidateAudience = true,
+                RequireSignedTokens = true,
+                IssuerSigningKey = credentials.Key,
+                ClockSkew = TimeSpan.FromMinutes(30)
+            };
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = validationParameters;
+#if PROD || UAT
+                options.IncludeErrorDetails=false;
+#else
+                options.RequireHttpsMetadata = false;
+#endif
+            });
+
         }
     }
 }
